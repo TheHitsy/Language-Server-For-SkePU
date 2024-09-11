@@ -10,7 +10,7 @@
 .DEFAULT_GOAL=all
 
 # Default backend set for SkePU precompiler.
-BACKENDS = -openmp -opencl -cuda
+BACKENDS = -openmp
 
 SKEPU_OPTIONS =
 PRECOMPILER_OPTIONS = --no-preserve-lines
@@ -36,8 +36,14 @@ CLUSTER_BACKENDS = -openmp
 CLUSTER_CXXFLAGS = -std=c++11 -fopenmp $$(pkg-config --cflags starpu-1.3 starpumpi-1.3) -I ./  -DSKEPU_DEBUG=3  -g -O3 
 CLUSTER_LIBS     = $$(pkg-config --libs starpu-1.3 starpumpi-1.3)
 
+CLANGTOOL_USER_FLAGS  = -I /usr/include/c++/10
+CLANGTOOL_USER_FLAGS += -I /usr/include/x86_64-linux-gnu/c++/10
+CLANGTOOL_USER_FLAGS += -I /usr/include/c++/10/backward
+CLANGTOOL_USER_FLAGS += -I /usr/lib/gcc/x86_64-linux-gnu/10/include
+CLANGTOOL_USER_FLAGS += -I /usr/local/include
+CLANGTOOL_USER_FLAGS += -I /usr/include/x86_64-linux-gnu
+CLANGTOOL_USER_FLAGS += -I /usr/include
 
-CLANGTOOL_USER_FLAGS =
 # ---------------------------------------------------------------------------- #
 # Compilers.
 

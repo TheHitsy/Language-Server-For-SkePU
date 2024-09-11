@@ -32,7 +32,7 @@ set(_skepu_examples
 	riemann_sum
 	taylor
 )
-
+set(SKEPU_EXAMPLES_SEQ ON)
 if(SKEPU_EXAMPLES_SEQ)
 	# Meta target for all sequential programs.
 	add_custom_target(all-sequential)
@@ -64,6 +64,7 @@ if(SKEPU_EXAMPLES_SEQ)
 		target_link_libraries(edgedetect_seq PRIVATE lodepng)
 	endif()
 endif()
+set(SKEPU_EXAMPLES_PAR OFF)
 
 if(SKEPU_EXAMPLES_PAR)
 	# Meta target for all parallel programs
@@ -102,6 +103,7 @@ if(SKEPU_EXAMPLES_PAR)
 		target_link_libraries(edgedetect_par PRIVATE lodepng)
 	endif()
 endif()
+set(SKEPU_EXAMPLES_MPI OFF)
 
 if(SKEPU_EXAMPLES_MPI)
 	# Meta target for all mpi programs

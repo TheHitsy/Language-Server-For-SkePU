@@ -15,7 +15,11 @@
 
 #include "globals.h"
 #include "data_structures.h"
+#ifdef SKEPUD_GLOBALS   
+#include "SkepuVisitor.h"
+#else
 #include "visitor.h"
+#endif
 #include "code_gen_cl.h"
 
 using namespace clang;
@@ -59,13 +63,14 @@ public:
 			bool allowed = std::find(AllowedFunctionNamesCalledInUFs.begin(), AllowedFunctionNamesCalledInUFs.end(), name)
 				!= AllowedFunctionNamesCalledInUFs.end();
 			if (!allowed)
-				GlobalRewriter.getSourceMgr().getDiagnostics().Report(c->getBeginLoc(), diag::err_skepu_userfunction_call) << name;
+				//GlobalRewriter.getSourceMgr().getDiagnostics().Report(c->getBeginLoc(), diag::err_skepu_userfunction_call) << name;
 
 			return allowed;
 		}
 
 		FunctionDecl *Func = c->getDirectCallee();
-		std::string name = Func->getName();
+		std::string name = Func->getName().str();
+		
 
 		if (name == "")
 		{
@@ -269,7 +274,7 @@ std::string UserFunction::Param::templateInstantiationType() const
 	if (auto *innertype = dyn_cast<ElaboratedType>(type))
 		type = innertype->getNamedType().getTypePtr();
 	const auto *templateType = dyn_cast<TemplateSpecializationType>(type);
-	return templateType->getArg(0).getAsType().getAsString();
+	return templateType->template_arguments()[0].getAsType().getAsString();
 }
 
 
@@ -287,7 +292,7 @@ UserFunction::RandomAccessParam::RandomAccessParam(const ParmVarDecl *p)
 		qualifier = "const";
 		if (p->hasAttr<SkepuOutAttr>())
 		{
-			GlobalRewriter.getSourceMgr().getDiagnostics().Report(p->getAttr<SkepuOutAttr>()->getRange().getBegin(), diag::err_skepu_invalid_out_attribute) << this->name;
+			//GlobalRewriter.getSourceMgr().getDiagnostics().Report(p->getAttr<SkepuOutAttr>()->getRange().getBegin(), diag::err_skepu_invalid_out_attribute) << this->name;
 		}
 
 		this->accessMode = AccessMode::Read;
@@ -310,7 +315,7 @@ UserFunction::RandomAccessParam::RandomAccessParam(const ParmVarDecl *p)
 		type = innertype->getNamedType().getTypePtr();
 
 	const auto *templateType = dyn_cast<TemplateSpecializationType>(type);
-	const clang::TemplateArgument containedTypeArg = templateType->getArg(0);
+	const clang::TemplateArgument containedTypeArg = templateType->template_arguments()[0];
 
 	std::string templateName = templateType->getTemplateName().getAsTemplateDecl()->getNameAsString();
 	this->containedType = containedTypeArg.getAsType().getTypePtr();
@@ -458,8 +463,8 @@ UserFunction::RandomParam::RandomParam(const ParmVarDecl *p)
 		type = innertype->getNamedType().getTypePtr();
 	
 	const auto *templateType = dyn_cast<TemplateSpecializationType>(type);
-	if (templateType->getNumArgs() > 0)
-		this->randomCount = templateType->getArg(0).getAsExpr()->EvaluateKnownConstInt(p->getASTContext()).getExtValue();
+	if (templateType->template_arguments().size() > 0)
+		this->randomCount = templateType->template_arguments()[0].getAsExpr()->EvaluateKnownConstInt(p->getASTContext()).getExtValue();
 	else
 		this->randomCount = 0;
 }
@@ -599,7 +604,7 @@ UserFunction::UserFunction(CXXMethodDecl *f, VarDecl *d)
 		this->codeLocation = DeclCtx->getSourceRange().getBegin();
 }
 
-UserFunction::UserFunction(FunctionDecl *f)
+UserFunction::UserFunction(clang::FunctionDecl *f)
 : astDeclNode(f), requiresDoublePrecision(false)
 {
 	// Function name
@@ -667,7 +672,7 @@ UserFunction::UserFunction(FunctionDecl *f)
 	//		SkePUAbort("Multi-valued return is not enabled for GPU backends.");
 		
 		const auto *templateType = f->getReturnType().getTypePtr()->getAs<clang::TemplateSpecializationType>();
-		for (const clang::TemplateArgument &arg : *templateType)
+		for (const clang::TemplateArgument &arg : templateType->template_arguments())
 		{
 			std::string argType = arg.getAsType().getAsString();
 			SkePULog() << "    [UF " << this->uniqueName << "] Multi-return type: " << argType << "\n";

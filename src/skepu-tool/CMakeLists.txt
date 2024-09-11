@@ -1,5 +1,7 @@
 set(LLVM_LINK_COMPONENTS Support)
 
+message(STATUS "[SkePU] skeputool")
+
 add_clang_executable(skepu-tool
   skepu.cpp
   visitor.cpp

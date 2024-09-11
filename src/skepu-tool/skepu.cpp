@@ -89,7 +89,7 @@ clang::SourceLocation blasBegin, blasEnd;
 
 llvm::raw_ostream& SkePULog()
 {
-	if (Verbose)
+	if (!Verbose)
 		return llvm::outs();
 	else
 		return llvm::nulls();
@@ -104,7 +104,7 @@ public:
 	bool BeginSourceFileAction(CompilerInstance &CI) override
 	{
 		inputFileName = this->getCurrentFile().str();
-		if (Verbose) SkePULog() << "** BeginSourceFileAction for: " << inputFileName << "\n";
+		if (!Verbose) SkePULog() << "** BeginSourceFileAction for: " << inputFileName << "\n";
 		return true;
 	}
 	
@@ -138,7 +138,7 @@ public:
 			GlobalRewriter.InsertText(blasIncludeLoc, blasTransformedCode);
 		}
 
-		if (Verbose) SkePULog() << "** EndSourceFileAction for: " << inputFileName << "\n";
+		if (!Verbose) SkePULog() << "** EndSourceFileAction for: " << inputFileName << "\n";
 
 		// Now emit the rewritten buffer.
 		std::error_code EC;
@@ -150,19 +150,30 @@ public:
 
 	std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI, StringRef file) override
 	{
-		if (Verbose) SkePULog() << "** Creating AST consumer for: " << file << "\n";
+		if (!Verbose) SkePULog() << "** Creating AST consumer for: " << file << "\n";
 		GlobalRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-		return llvm::make_unique<SkePUASTConsumer>(&CI.getASTContext(), this->SkeletonInstances);
+		return std::make_unique<SkePUASTConsumer>(&CI.getASTContext(), this->SkeletonInstances);
 	}
 
 private:
 	std::unordered_set<clang::VarDecl *> SkeletonInstances;
 };
 
-
 int main(int argc, const char **argv)
 {
-	tooling::CommonOptionsParser op(argc, argv, SkePUCategory);
+
+	for (int i = 1; i < argc; ++i) {
+        SkePULog() << "Argument " << i << ": " << argv[i] << "\n";
+    }
+	
+	auto ExpectedParser = tooling::CommonOptionsParser::create(argc, argv, SkePUCategory);
+	if (!ExpectedParser) {
+		// Fail gracefully for unsupported options.
+		SkePULog() << "The expected parseer for SkePU tool has failed \n";
+		llvm::errs() << ExpectedParser.takeError();
+	}
+
+	tooling::CommonOptionsParser& op = ExpectedParser.get();
 	tooling::ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
 	if (ResultName == "")

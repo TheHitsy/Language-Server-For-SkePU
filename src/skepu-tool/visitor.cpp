@@ -61,7 +61,7 @@ UserFunction *HandleLambdaArg(Expr *ArgExpr, VarDecl *d)
 	Expr *Arg = ConstrExpr->getArg(0);
 
 	if (MaterializeTemporaryExpr *MatTempExpr = dyn_cast<MaterializeTemporaryExpr>(Arg))
-		Arg = MatTempExpr->GetTemporaryExpr();
+		Arg = MatTempExpr->getSubExpr();
 
 	LambdaExpr *Lambda = dyn_cast<LambdaExpr>(Arg);
 	if (!Lambda)
@@ -104,7 +104,7 @@ const Skeleton::Type* DeclIsValidSkeleton(VarDecl *d)
 	auto *TempExpr = ConstructExpr->getArgs()[0];
 
 	if (auto *MatTempExpr = dyn_cast<MaterializeTemporaryExpr>(TempExpr))
-		TempExpr = MatTempExpr->GetTemporaryExpr();
+		TempExpr = MatTempExpr->getSubExpr();
 
 	if (auto *BindTempExpr = dyn_cast<CXXBindTemporaryExpr>(TempExpr))
 		TempExpr = BindTempExpr->getSubExpr();
@@ -150,7 +150,7 @@ bool HandleSkeletonInstance(VarDecl *d)
 	if (!ConstructExpr || ConstructExpr->getConstructionKind() != CXXConstructExpr::ConstructionKind::CK_Complete)
 		SkePUAbort("Not a complete constructor");
 
-	Expr *TempExpr = dyn_cast<MaterializeTemporaryExpr>(ConstructExpr->getArgs()[0])->GetTemporaryExpr();
+	Expr *TempExpr = dyn_cast<MaterializeTemporaryExpr>(ConstructExpr->getArgs()[0])->getSubExpr();
 
 	 if (isa<CXXBindTemporaryExpr>(TempExpr))
 		TempExpr = dyn_cast<CXXBindTemporaryExpr>(TempExpr)->getSubExpr();
@@ -179,13 +179,13 @@ bool HandleSkeletonInstance(VarDecl *d)
 	case Skeleton::Type::Map:
 	case Skeleton::Type::MapReduce:
 		assert(Template->getNumArgs() > 0);
-		arity[0] = Template->getArg(0).getAsExpr()->EvaluateKnownConstInt(d->getASTContext()).getExtValue();
+		arity[0] = Template->template_arguments()[0].getAsExpr()->EvaluateKnownConstInt(d->getASTContext()).getExtValue();
 		break;
 	case Skeleton::Type::MapPairs:
 	case Skeleton::Type::MapPairsReduce:
 		assert(Template->getNumArgs() > 1);
-		arity[0] = Template->getArg(0).getAsExpr()->EvaluateKnownConstInt(d->getASTContext()).getExtValue();
-		arity[1] = Template->getArg(1).getAsExpr()->EvaluateKnownConstInt(d->getASTContext()).getExtValue();
+		arity[0] = Template->template_arguments()[0].getAsExpr()->EvaluateKnownConstInt(d->getASTContext()).getExtValue();
+		arity[1] = Template->template_arguments()[1].getAsExpr()->EvaluateKnownConstInt(d->getASTContext()).getExtValue();
 		break;
 	case Skeleton::Type::MapOverlap1D:
 		arity[0] = 1; break;
@@ -282,7 +282,8 @@ bool SkePUASTVisitor::VisitVarDecl(VarDecl *d)
 	
 	
 	
-	
+	//SkePULog() << "VisitVarDecl: " << d->getNameAsString() << "\n";
+
 	
 	// Change this condition to check for skeleon class names, (and namespace too?)
 //	if (d->hasAttr<SkepuInstanceAttr>())

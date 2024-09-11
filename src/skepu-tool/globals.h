@@ -23,8 +23,11 @@
 #include "clang/Lex/Lexer.h"
 #include "clang/Basic/Diagnostic.h"
 
+#ifdef SKEPUD_GLOBALS   
+#include "../../../src/skepu-tool/data_structures.h"
+#else
 #include "data_structures.h"
-
+#endif
 
 extern llvm::cl::opt<bool> GenCUDA;
 extern llvm::cl::opt<bool> GenOMP;

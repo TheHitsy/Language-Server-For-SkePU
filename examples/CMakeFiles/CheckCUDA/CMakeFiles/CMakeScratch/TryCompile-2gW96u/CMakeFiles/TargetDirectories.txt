@@ -1,0 +1,3 @@
+/home/marcus/git_folder/skepu/examples/CMakeFiles/CheckCUDA/CMakeFiles/CMakeScratch/TryCompile-2gW96u/CMakeFiles/cmTC_050da.dir
+/home/marcus/git_folder/skepu/examples/CMakeFiles/CheckCUDA/CMakeFiles/CMakeScratch/TryCompile-2gW96u/CMakeFiles/edit_cache.dir
+/home/marcus/git_folder/skepu/examples/CMakeFiles/CheckCUDA/CMakeFiles/CMakeScratch/TryCompile-2gW96u/CMakeFiles/rebuild_cache.dir
