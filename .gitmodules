@@ -4,3 +4,6 @@
 [submodule "skepu-headers"]
 	path = skepu-headers
 	url = ../skepu-headers.git
+[submodule "vscode-clangd"]
+	path = skepu-headers
+	url = https://github.com/TheHitsy/vscode-clangd
