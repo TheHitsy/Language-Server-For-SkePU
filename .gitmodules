@@ -3,7 +3,7 @@
 	url = https://github.com/TheHitsy/llvm-project
 [submodule "skepu-headers"]
 	path = skepu-headers
-	url = https://github.com/skepu/skepu-headers/tree/8ff3bc134bc403790ef16e11c8ee06e23cf1e1aa
+	url = https://github.com/TheHitsy/skepu-headers
 [submodule "vscode-clangd"]
 	path = vscode-clangd
 	url = https://github.com/TheHitsy/vscode-clangd
