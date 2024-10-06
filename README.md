@@ -1,5 +1,3 @@
-[![pipeline status](https://gitlab.ida.liu.se/exa2pro/skepu/badges/master/pipeline.svg)](https://gitlab.ida.liu.se/exa2pro/skepu/commits/master)
-[![coverage report](https://gitlab.ida.liu.se/exa2pro/skepu/badges/master/coverage.svg)](https://gitlab.ida.liu.se/exa2pro/skepu/commits/master)
 **This is a fork of SkePU and is not a mirror.**
 
 # Language Server For SkePU
